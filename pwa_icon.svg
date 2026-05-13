@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="100" fill="#F7F6F2"/>
+  <!-- Bottle body -->
+  <rect x="186" y="220" width="140" height="200" rx="24" fill="#3A8FA8"/>
+  <!-- Bottle neck -->
+  <rect x="216" y="160" width="80" height="68" rx="12" fill="#3A8FA8"/>
+  <!-- Bottle cap -->
+  <rect x="206" y="138" width="100" height="30" rx="8" fill="#2E6A80"/>
+  <!-- Spray nozzle -->
+  <rect x="286" y="125" width="30" height="14" rx="4" fill="#2E6A80"/>
+  <!-- Label area -->
+  <rect x="200" y="265" width="112" height="110" rx="8" fill="#fff" opacity="0.25"/>
+  <!-- Monogram G -->
+  <text x="256" y="340" text-anchor="middle" font-family="Georgia, serif" font-size="62" font-weight="400" fill="#fff" opacity="0.9">G</text>
+  <!-- Shimmer dots -->
+  <circle cx="330" cy="235" r="5" fill="#fff" opacity="0.5"/>
+  <circle cx="345" cy="255" r="3" fill="#fff" opacity="0.35"/>
+  <circle cx="320" cy="258" r="3.5" fill="#fff" opacity="0.3"/>
+</svg>

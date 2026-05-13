@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Perfume"/>
+<meta name="theme-color" content="#F7F6F2"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<title>Perfume Wardrobe</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:#F7F6F2;font-family:system-ui,-apple-system,sans-serif;color:#1A1A18;padding-bottom:env(safe-area-inset-bottom)}
+  input{font-family:inherit;font-size:14px}
+  button{font-family:inherit;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel">
+const { useState } = React;
+
+const collection = [
+  { id:1, name:"Allure Homme Sport", house:"Chanel", type:"EdT", tier:"Ultra Light / Active", family:"Fresh Aromatic / Fougère", color:"#B8924A", top:["Aldehydes","Elemi","Lemon","Neroli"], middle:["Pepper","Cedar","Vetiver"], base:["Tonka Bean","White Musk","Vanilla"], sprays:"2–3", application:"Chest + neck. Spray close to skin — needs warmth to project. Apply right after shower.", usage:{ time:["Morning","Day"], temperature:["Humid","Warm","Hot"], occasion:["Work","Active","Casual"], setting:["Cockpit","Gym","Outdoor"], season:["All Year"], social:["Solo","Professional"], duration:"3–4 hrs", intensity:2, notes:"Your cockpit and gym workhorse. Light enough for confined professional spaces. Never evening." }},
+  { id:2, name:"Aqua Universalis", house:"MFK", type:"EdT", tier:"Fresh / Aquatic", family:"Fresh Floral", color:"#3A8FA8", top:["Bergamot","Lemon","Aldehydes"], middle:["Lily of the Valley","Jasmine","Rose"], base:["Musk","Oakmoss","Sandalwood"], sprays:"2–3", application:"Wrists + chest. Re-spray midday freely. Never rub wrists.", usage:{ time:["Morning","Day"], temperature:["Hot","Humid","Warm"], occasion:["Casual","Work","Leisure"], setting:["Cockpit","Outdoor","Classroom","Temple"], season:["All Year"], social:["Solo","Professional","Small Group"], duration:"3–4 hrs", intensity:1, notes:"Most inoffensive bottle you own. Temple visits, cockpit duty, hot Bangkok days. Re-spray friendly." }},
+  { id:3, name:"L'Eau d'Issey Pour Homme", house:"Issey Miyake", type:"EdT", tier:"Fresh / Aquatic", family:"Aquatic / Fresh", color:"#4A8FAA", top:["Yuzu","Lemon","Cyclamen","Calone"], middle:["Sage","Cinnamon","Nutmeg","Lily"], base:["Sandalwood","Musk","Amber","Tobacco"], sprays:"2–3", application:"Chest + one wrist. Excellent layered under clothing.", usage:{ time:["Morning","Day"], temperature:["Hot","Humid","Warm"], occasion:["Casual","Leisure"], setting:["Outdoor","Gym","Everyday"], season:["All Year"], social:["Solo","Small Group"], duration:"3–4 hrs", intensity:1, notes:"Pure Bangkok daytime heat fragrance. Simple, clean, never wrong outdoors. Best for active casual days." }},
+  { id:4, name:"CK IN2U Him", house:"Calvin Klein", type:"EdT", tier:"Fresh / Aquatic", family:"Fresh Woody Aromatic", color:"#5A9A6A", top:["Grapefruit","Hashish","Hedione"], middle:["Mint","Birch","Cactus"], base:["Sandalwood","Musk","Vanilla","White Cedar"], sprays:"2–3", application:"Chest + wrists. Re-spray friendly throughout day.", usage:{ time:["Morning","Day"], temperature:["Hot","Humid","Warm"], occasion:["Casual","Leisure","Work"], setting:["Classroom","Outdoor","Everyday"], season:["All Year"], social:["Solo","Small Group","Professional"], duration:"3–4 hrs", intensity:2, notes:"The most herbal-green scent in your collection. Slightly more interesting than Issey for casual days. Good classroom scent as student." }},
+  { id:5, name:"Allure Homme Édition Blanche", house:"Chanel", type:"EdT", tier:"Polished Daytime", family:"Fresh Powdery", color:"#8A7AAA", top:["Lemon","Bergamot","Mandarin"], middle:["Iris","Vetiver","Cardamom"], base:["Vanilla","White Musk","Sandalwood"], sprays:"2", application:"Chest only. Spray closer to skin than usual. Let it be subtle.", usage:{ time:["Morning","Day"], temperature:["Hot","Humid","Warm","Cool"], occasion:["Work","Casual","Semi-Formal"], setting:["Cockpit","Office","Classroom","Everyday"], season:["All Year"], social:["Solo","Professional","Small Group"], duration:"4–5 hrs", intensity:2, notes:"Your most professional and polished daytime scent. Perfect cockpit fragrance for long-haul. Understated authority." }},
+  { id:6, name:"Bleu de Chanel", house:"Chanel", type:"EdP", tier:"Polished Daytime", family:"Fresh Woody Aromatic", color:"#2E5FA5", top:["Lemon","Mint","Pink Pepper","Grapefruit"], middle:["Ginger","Nutmeg","Jasmine","Iso E Super"], base:["Labdanum","Sandalwood","Cedar","Vetiver","White Musk"], sprays:"3", application:"Chest + both wrists. Don't overspray — can turn soapy.", usage:{ time:["Morning","Day","Evening"], temperature:["Hot","Humid","Warm","Cool"], occasion:["Work","Casual","Semi-Formal","Leisure"], setting:["Classroom","Office","Rooftop","Warm Layover","Everyday"], season:["All Year"], social:["Professional","Small Group","Date"], duration:"6–8 hrs", intensity:3, notes:"Your single most versatile bottle. Bangkok errands, warm layovers (KIX), classroom teaching, casual dining. The true workhorse." }},
+  { id:7, name:"Amyris Homme", house:"MFK", type:"EdT", tier:"Aromatic / Exploratory", family:"Woody Aromatic", color:"#8A6A40", top:["Bergamot","Grapefruit","Elemi"], middle:["Vetiver","Amyris Wood","Aromatic Notes"], base:["Oakmoss","Musk","Sandalwood"], sprays:"2–3", application:"Chest + wrist. Woody base needs skin warmth — chest priority.", usage:{ time:["Morning","Day"], temperature:["Warm","Cool","Humid"], occasion:["Casual","Leisure"], setting:["Everyday","Indoor","Exploration"], season:["All Year"], social:["Solo","Small Group"], duration:"4–5 hrs", intensity:2, notes:"Casual Bangkok home day scent. Woody and aromatic — use on exploration days to audition for a full bottle decision." }},
+  { id:8, name:"L'Homme À la Rose", house:"MFK", type:"EdP", tier:"Aromatic / Exploratory", family:"Floral Woody", color:"#C4607A", top:["Grapefruit","Bergamot"], middle:["Centifolia Rose","Geranium"], base:["Sandalwood","White Musk","Cedar"], sprays:"2", application:"Chest + neck. Floral — don't overspray or it feminizes quickly.", usage:{ time:["Morning","Day"], temperature:["Warm","Cool"], occasion:["Casual","Leisure"], setting:["Indoor","Everyday","Exploration"], season:["Spring","All Year"], social:["Solo","Small Group"], duration:"4–5 hrs", intensity:2, notes:"2 sprays hard limit. Wear on casual home days. Unique floral masculine — keep it understated." }},
+  { id:9, name:"724", house:"MFK", type:"EdP", tier:"Aromatic / Exploratory", family:"Fresh Floral Musky", color:"#8A7A50", top:["Bergamot","Lemon","Neroli"], middle:["Jasmine","Iris","Musk"], base:["Musk","Ambrette","Sandalwood"], sprays:"2–3", application:"Wrists + chest. Clean musky — great on wrists where it evolves nicely.", usage:{ time:["Morning","Day"], temperature:["Hot","Humid","Warm","Cool"], occasion:["Work","Casual","Leisure"], setting:["Cockpit","Classroom","Office","Everyday"], season:["All Year"], social:["Professional","Solo","Small Group"], duration:"5–6 hrs", intensity:2, notes:"Clean, musky, crew-considerate. Great cockpit alternative to Blanche. Good as student in classroom." }},
+  { id:10, name:"Gentle Fluidity Silver", house:"MFK", type:"EdP", tier:"Aromatic / Exploratory", family:"Woody Aromatic Spicy", color:"#6A7A8A", top:["Bergamot","Juniper"], middle:["Coriander","Nutmeg","Geranium"], base:["Musk","Ambrette","Sandalwood"], sprays:"3", application:"Chest + wrists. Aromatic and woody — benefits from pulse points.", usage:{ time:["Day","Evening"], temperature:["Cool","Warm","Humid"], occasion:["Casual","Semi-Formal","Leisure"], setting:["Indoor","Everyday","Warm Layover"], season:["All Year"], social:["Solo","Small Group","Date"], duration:"5–6 hrs", intensity:3, notes:"Cooler, drier counterpart to Gold. Day into early evening. Warm layovers and casual social. More versatile than Gold." }},
+  { id:11, name:"Gentle Fluidity Gold", house:"MFK", type:"EdP", tier:"Warm Versatile", family:"Woody Oriental Musky", color:"#B8882A", top:["Bergamot","Juniper"], middle:["Coriander","Nutmeg","Geranium"], base:["Vanilla","Oud","Musk","Ambrette","Sandalwood"], sprays:"3", application:"Chest + wrists. Warmer and richer than Silver — give it room to breathe on skin.", usage:{ time:["Evening","Night"], temperature:["Cool","Warm"], occasion:["Casual","Semi-Formal","Leisure"], setting:["Rooftop","Warm Layover","Dinner","Indoor"], season:["All Year"], social:["Small Group","Date","Social"], duration:"6–7 hrs", intensity:3, notes:"Warm intimate evening scent. KIX and Asian layovers. Rooftop dining. Vanilla-oud base is conversation-close and sophisticated." }},
+  { id:12, name:"Baccarat Rouge 540", house:"MFK", type:"EdP", tier:"Warm Versatile", family:"Floral Ambré Woody", color:"#C03020", top:["Jasmine","Saffron"], middle:["Amberwood","Ambergris"], base:["Fir Resin","Cedar"], sprays:"2–3", application:"Chest + one wrist only. Never spray neck. Avoid clothing — stains.", usage:{ time:["Evening","Night"], temperature:["Cool","Warm","Humid"], occasion:["Semi-Formal","Formal","Leisure","Casual"], setting:["Club","Rooftop","Dinner","Date","Indoor Social"], season:["All Year"], social:["Date","Social","Large Group"], duration:"8–10 hrs", intensity:4, notes:"Your signature Bangkok social scent. Club, rooftop, dinner dates. Never overspray — 2 sprays is enough. Most complimented bottle you own." }},
+  { id:13, name:"Layton Exclusif", house:"Parfums de Marly", type:"EdP", tier:"Evening / Date", family:"Woody Oriental Spicy", color:"#6A3A8A", top:["Apple","Bergamot","Lavender","Mandarin"], middle:["Geranium","Violet","Jasmine"], base:["Vanilla","Cardamom","Sandalwood","Pepper","Patchouli","Guaiac Wood","Oud","Civet"], sprays:"2 MAX", application:"Chest only, or chest + one wrist. Spray 30 min before leaving. Never on clothes.", usage:{ time:["Evening","Night"], temperature:["Cold","Cool"], occasion:["Semi-Formal","Formal","Leisure"], setting:["Club","Date","Fine Dining","European Layover","Indoor"], season:["Cool Season","Winter"], social:["Date","Small Group","Social"], duration:"10–12 hrs", intensity:5, notes:"2 sprays MAXIMUM. Your CDG/FRA layover signature. Bangkok date nights Oct–Feb. Spray 30 min before going out. Never in Bangkok heat outdoors." }},
+  { id:14, name:"Grand Soir", house:"MFK", type:"EdP", tier:"Statement / Occasion", family:"Oriental Ambré Woody", color:"#8A6010", top:["Cinnamon","Pepper"], middle:["Tobacco Leaf","Incense","Osmanthus","Labdanum"], base:["Vanilla","Iso E Super","Musk","Cedar","Cypriol","Vetiver"], sprays:"2–3", application:"Chest + wrist. Pulse points only. Best on clean dry skin after shower.", usage:{ time:["Evening","Night"], temperature:["Cold","Cool"], occasion:["Formal","Semi-Formal"], setting:["Fine Dining","European Layover","Special Occasion","Indoor"], season:["Cool Season","Winter"], social:["Date","Small Group"], duration:"8–10 hrs", intensity:4, notes:"Reserve for special evenings. CDG/FRA layover nights. Tobacco and incense — needs cool air to shine. Too heavy for Bangkok heat." }},
+  { id:15, name:"Acqua di Parma Oud", house:"Acqua di Parma", type:"EdP", tier:"Statement / Occasion", family:"Oriental Woody Oud", color:"#5A3020", top:["Bergamot","Pink Pepper","Cardamom"], middle:["Oud","Rose","Geranium"], base:["Sandalwood","Patchouli","Leather","Amber"], sprays:"1–2 ONLY", application:"Chest only. Spray 45 min before event. Never on clothes.", usage:{ time:["Evening","Night"], temperature:["Cold","Cool","Warm"], occasion:["Formal","Special Occasion"], setting:["Fine Dining","Special Occasion","Indoor"], season:["Cool Season"], social:["Date","Small Group"], duration:"12+ hrs", intensity:5, notes:"Most powerful bottle you own. Wear it rarely so it stays special. 1–2 sprays only. 45 min settle time. Maximum statement occasions only." }},
+  { id:16, name:"Mantis Monument", house:"Copenn", type:"EdP", tier:"Aromatic / Exploratory", family:"Aromatic Green Woody", color:"#3A7A3A", top:["Bergamot","Kabosu","Pepper","Neroli"], middle:["Basil","Coriander","Cedarwood"], base:["Vetiver","Cedarwood"], sprays:"2–3", application:"Chest + wrists. Green and aromatic — give it time on skin before judging.", usage:{ time:["Morning","Day"], temperature:["Hot","Humid","Warm"], occasion:["Casual","Leisure","Work"], setting:["Outdoor","Everyday","Classroom","Indoor"], season:["All Year"], social:["Solo","Small Group","Professional"], duration:"4–5 hrs", intensity:2, notes:"Your most herbal-green scent — bergamot, basil, kabosu and pepper on a vetiver-cedar base. Bangkok daytime casual and classroom as student." }},
+  { id:17, name:"Verdigris", house:"Copenn", type:"EdP", tier:"Aromatic / Exploratory", family:"Green Floral Mossy", color:"#4A8A5A", top:["Fig Leaf","Pink Pepper"], middle:["Muguet","Violet","Guaiac Wood"], base:["Oakmoss","Musk"], sprays:"2–3", application:"Chest + one wrist. Green and ozonic — skin warmth brings out the mossy depth.", usage:{ time:["Morning","Day"], temperature:["Hot","Humid","Warm","Cool"], occasion:["Casual","Leisure"], setting:["Outdoor","Everyday","Indoor"], season:["All Year"], social:["Solo","Small Group"], duration:"4–5 hrs", intensity:2, notes:"Fig leaf and oakmoss — genuinely green and earthy. Closest thing to a chypre in your collection. Bangkok casual days, warm layovers." }},
+  { id:18, name:"Boqeh", house:"Copenn", type:"EdP", tier:"Aromatic / Exploratory", family:"Floral Oriental", color:"#B07840", top:["Frankincense","Orange Blossom"], middle:["Osmanthus","Lily","Tea","Rose"], base:["Patchouli","Musk"], sprays:"2–3", application:"Chest + neck. Floral and incense-laced — pulse points amplify the orange blossom.", usage:{ time:["Day","Evening"], temperature:["Warm","Cool","Humid"], occasion:["Casual","Semi-Formal","Leisure"], setting:["Indoor","Rooftop","Dinner","Everyday"], season:["All Year"], social:["Small Group","Date","Solo"], duration:"5–6 hrs", intensity:3, notes:"Frankincense-led floral with tea and osmanthus — meditative and refined. Day-to-evening bridge. Good for Bangkok indoor social and rooftop casual dining." }},
+  { id:19, name:"An Artefact", house:"Copenn", type:"EdP", tier:"Evening / Date", family:"Smoky Woody Oriental", color:"#6A5840", top:["Black Pepper","Cypress"], middle:["Iris","Sandalwood","Leather"], base:["Vetiver","Olibanum","Benzoin","Incense"], sprays:"2", application:"Chest only. Dark and smoky — 2 sprays maximum, needs 20 min to settle.", usage:{ time:["Evening","Night"], temperature:["Cool","Warm","Cold"], occasion:["Semi-Formal","Formal","Leisure"], setting:["Indoor","Date","Fine Dining","European Layover"], season:["Cool Season","All Year"], social:["Date","Small Group"], duration:"6–8 hrs", intensity:4, notes:"Leather, incense, iris and benzoin — architectural and serious. Evening scent that competes with Grand Soir territory but darker and smokier." }},
+  { id:20, name:"The Desert Composer", house:"Copenn", type:"EdP", tier:"Statement / Occasion", family:"Spicy Oriental Oud", color:"#A86830", top:["Cardamom","Nutmeg","Cassia"], middle:["Rose","Coumarin","Oud"], base:["Tonka Bean","Patchouli"], sprays:"2", application:"Chest only. Rich oud-spice — spray 30 min before going out. Never on clothes.", usage:{ time:["Evening","Night"], temperature:["Cool","Cold","Warm"], occasion:["Semi-Formal","Formal","Special Occasion"], setting:["Fine Dining","Date","Indoor","European Layover"], season:["Cool Season","Winter"], social:["Date","Small Group"], duration:"8–10 hrs", intensity:5, notes:"Cardamom-cassia-oud-tonka — desert warmth and spice. Sits alongside Layton Exclusif and Acqua di Parma Oud in the statement tier. Reserve for special evenings and cool weather." }},
+];
+
+const FILTERS = {
+  time: ["Morning","Day","Evening","Night"],
+  temperature: ["Hot","Humid","Warm","Cool","Cold"],
+  occasion: ["Work","Casual","Leisure","Semi-Formal","Formal","Active","Special Occasion"],
+  setting: ["Cockpit","Gym","Classroom","Office","Outdoor","Indoor","Club","Rooftop","Date","Fine Dining","Temple","Warm Layover","European Layover","Everyday"],
+  season: ["All Year","Cool Season","Winter","Spring"],
+  social: ["Solo","Professional","Small Group","Large Group","Date","Social"],
+};
+
+const intensityLabel = n => ["","Whisper","Soft","Present","Bold","Beast"][n];
+
+const tierColors = { "Ultra Light / Active":"#E8F4F0","Fresh / Aquatic":"#E6EFF8","Polished Daytime":"#EEE8F8","Aromatic / Exploratory":"#F4EDE4","Warm Versatile":"#FBF0E0","Evening / Date":"#F0E8F4","Statement / Occasion":"#F8ECE8" };
+const tierText = { "Ultra Light / Active":"#1A6A5A","Fresh / Aquatic":"#1A4A8A","Polished Daytime":"#4A2A8A","Aromatic / Exploratory":"#6A3A18","Warm Versatile":"#7A4A08","Evening / Date":"#6A1A7A","Statement / Occasion":"#7A2218" };
+
+function App() {
+  const [activeTab, setActiveTab] = useState("Usage");
+  const [activeFilters, setActiveFilters] = useState({});
+  const [expanded, setExpanded] = useState(null);
+  const [search, setSearch] = useState("");
+  const [activeFilterGroup, setActiveFilterGroup] = useState("time");
+
+  const toggleFilter = (group, value) => {
+    setActiveFilters(prev => {
+      const cur = prev[group] || [];
+      const upd = cur.includes(value) ? cur.filter(v => v !== value) : [...cur, value];
+      if (!upd.length) { const { [group]: _, ...rest } = prev; return rest; }
+      return { ...prev, [group]: upd };
+    });
+  };
+
+  const clearFilters = () => setActiveFilters({});
+  const hasFilters = Object.keys(activeFilters).length > 0;
+
+  const filtered = collection.filter(f => {
+    const ms = !search || f.name.toLowerCase().includes(search.toLowerCase()) || f.house.toLowerCase().includes(search.toLowerCase());
+    const mf = Object.entries(activeFilters).every(([g, vals]) => !vals.length || vals.some(v => (f.usage[g] || []).includes(v)));
+    return ms && mf;
+  });
+
+  const badge = (label, active, color) => ({
+    display:"inline-block", padding:"3px 10px", borderRadius:"20px", fontSize:"12px",
+    background: active ? color+"22" : "#F4F4F2",
+    border:`1px solid ${active ? color+"60" : "#E4E2DC"}`,
+    color: active ? color : "#888",
+  });
+
+  return (
+    <div style={{minHeight:"100vh",background:"#F7F6F2",paddingBottom:"calc(24px + env(safe-area-inset-bottom))"}}>
+      <div style={{maxWidth:"820px",margin:"0 auto",padding:"52px 16px 40px"}}>
+
+        {/* Header */}
+        <div style={{marginBottom:"28px"}}>
+          <div style={{fontSize:"10px",letterSpacing:"0.2em",color:"#AAA89A",marginBottom:"8px",textTransform:"uppercase"}}>Gonk · Personal Fragrance Reference</div>
+          <h1 style={{fontSize:"clamp(26px,5vw,40px)",fontWeight:500,margin:"0 0 4px",color:"#1A1A18"}}>Wardrobe</h1>
+          <div style={{fontSize:"13px",color:"#AAA89A",fontStyle:"italic"}}>{collection.length} fragrances · occasion-mapped</div>
+        </div>
+
+        {/* Bangkok tip */}
+        <div style={{background:"#E8F4F0",border:"1px solid #B0D8CC",borderRadius:"10px",padding:"11px 14px",marginBottom:"20px",display:"flex",gap:"10px",alignItems:"flex-start"}}>
+          <span style={{fontSize:"15px",flexShrink:0}}>🌡️</span>
+          <div style={{fontSize:"12px",color:"#1A6A5A",lineHeight:1.5}}>
+            <strong style={{fontWeight:500}}>Bangkok filter tip:</strong> Use <em>Hot + Humid</em> for outdoors. <em>Cool</em> = malls, cockpit, A/C. <em>Cold</em> = Europe layovers only.
+          </div>
+        </div>
+
+        {/* Search */}
+        <div style={{position:"relative",marginBottom:"14px"}}>
+          <span style={{position:"absolute",left:"12px",top:"50%",transform:"translateY(-50%)",color:"#CCC",fontSize:"14px"}}>🔍</span>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search fragrance or house..."
+            style={{width:"100%",padding:"11px 14px 11px 34px",background:"#fff",border:"1px solid #E4E2DC",borderRadius:"8px",color:"#1A1A18",outline:"none",boxShadow:"0 1px 3px rgba(0,0,0,0.05)"}}/>
+        </div>
+
+        {/* Tabs */}
+        <div style={{display:"flex",gap:"0",marginBottom:"16px",background:"#EEECEA",borderRadius:"8px",padding:"3px",border:"1px solid #E0DED8"}}>
+          {["Usage","Notes","Application"].map(tab=>(
+            <button key={tab} onClick={()=>setActiveTab(tab)} style={{
+              flex:1,padding:"9px",border:"none",fontSize:"12px",letterSpacing:"0.06em",
+              textTransform:"uppercase",borderRadius:"6px",transition:"all 0.15s",
+              background:activeTab===tab?"#fff":"transparent",
+              color:activeTab===tab?"#1A1A18":"#888",
+              fontWeight:activeTab===tab?500:400,
+              boxShadow:activeTab===tab?"0 1px 3px rgba(0,0,0,0.08)":"none"
+            }}>{tab}</button>
+          ))}
+        </div>
+
+        {/* Filter Panel */}
+        {activeTab==="Usage" && (
+          <div style={{marginBottom:"16px",background:"#fff",border:"1px solid #E4E2DC",borderRadius:"12px",padding:"14px",boxShadow:"0 1px 4px rgba(0,0,0,0.04)"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
+              <div style={{fontSize:"10px",letterSpacing:"0.15em",color:"#AAA",textTransform:"uppercase",fontWeight:500}}>Filter by occasion</div>
+              {hasFilters && (
+                <button onClick={clearFilters} style={{fontSize:"11px",letterSpacing:"0.06em",color:"#B05020",background:"#FBF0E8",border:"1px solid #F0C8A0",borderRadius:"6px",padding:"3px 10px",textTransform:"uppercase"}}>
+                  Clear · {filtered.length} shown
+                </button>
+              )}
+            </div>
+            <div style={{display:"flex",gap:"5px",marginBottom:"12px",flexWrap:"wrap"}}>
+              {Object.keys(FILTERS).map(group=>{
+                const active=activeFilterGroup===group;
+                const hasA=(activeFilters[group]||[]).length>0;
+                return (
+                  <button key={group} onClick={()=>setActiveFilterGroup(group)} style={{
+                    padding:"5px 10px",borderRadius:"6px",border:`1px solid ${active?"#C8A060":"#E4E2DC"}`,
+                    fontSize:"11px",letterSpacing:"0.06em",textTransform:"uppercase",transition:"all 0.12s",
+                    background:active?"#FBF0E0":"#F8F7F4",
+                    color:active?"#7A4A08":hasA?"#5A7A40":"#888",fontWeight:active?500:400,
+                  }}>{group}{hasA?` · ${activeFilters[group].length}`:""}</button>
+                );
+              })}
+            </div>
+            <div style={{display:"flex",gap:"6px",flexWrap:"wrap"}}>
+              {FILTERS[activeFilterGroup].map(value=>{
+                const active=(activeFilters[activeFilterGroup]||[]).includes(value);
+                const bkk=["Hot","Humid"].includes(value)&&activeFilterGroup==="temperature";
+                return (
+                  <button key={value} onClick={()=>toggleFilter(activeFilterGroup,value)} style={{
+                    padding:"6px 12px",borderRadius:"20px",fontSize:"12px",transition:"all 0.12s",
+                    border:`1px solid ${active?"#3A8FA8":bkk?"#B0D8CC":"#E4E2DC"}`,
+                    background:active?"#E6F4F8":bkk?"#F2FAF7":"#F8F7F4",
+                    color:active?"#1A5A70":bkk?"#2A7A60":"#666",fontWeight:active?500:400,
+                  }}>{value}{bkk&&!active?" ★":""}</button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Count */}
+        <div style={{fontSize:"10px",letterSpacing:"0.1em",color:"#CCC",marginBottom:"12px",textTransform:"uppercase"}}>
+          {filtered.length} of {collection.length} fragrances
+        </div>
+
+        {/* Cards */}
+        <div style={{display:"flex",flexDirection:"column",gap:"8px"}}>
+          {filtered.map(f=>{
+            const isOpen=expanded===f.id;
+            return (
+              <div key={f.id} onClick={()=>setExpanded(isOpen?null:f.id)} style={{
+                background:"#fff",border:`1px solid ${isOpen?"#D0CEC8":"#E8E6E0"}`,
+                borderRadius:"12px",overflow:"hidden",cursor:"pointer",transition:"all 0.15s",
+                borderLeft:`4px solid ${f.color}`,
+                boxShadow:isOpen?"0 2px 10px rgba(0,0,0,0.07)":"0 1px 3px rgba(0,0,0,0.03)"
+              }}>
+                {/* Header */}
+                <div style={{padding:"13px 14px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:"11px"}}>
+                    <div style={{width:"34px",height:"34px",borderRadius:"50%",flexShrink:0,background:f.color+"22",border:`2px solid ${f.color}40`,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                      <div style={{width:"12px",height:"12px",borderRadius:"50%",background:f.color}}/>
+                    </div>
+                    <div>
+                      <div style={{fontSize:"14px",fontWeight:500,color:"#1A1A18",marginBottom:"2px"}}>{f.name}</div>
+                      <div style={{display:"flex",alignItems:"center",gap:"6px",flexWrap:"wrap"}}>
+                        <span style={{fontSize:"12px",color:"#888"}}>{f.house} · {f.type}</span>
+                        <span style={{fontSize:"10px",padding:"1px 7px",borderRadius:"10px",background:tierColors[f.tier]||"#F4F4F2",color:tierText[f.tier]||"#555"}}>{f.tier}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{display:"flex",alignItems:"center",gap:"8px",flexShrink:0}}>
+                    <div style={{display:"flex",gap:"2px"}}>
+                      {[1,2,3,4,5].map(i=>(
+                        <div key={i} style={{width:"4px",height:"16px",borderRadius:"2px",background:i<=f.usage.intensity?f.color:"#EEE"}}/>
+                      ))}
+                    </div>
+                    <span style={{color:"#CCC",fontSize:"13px",transform:isOpen?"rotate(180deg)":"rotate(0)",transition:"transform 0.2s",display:"inline-block"}}>↓</span>
+                  </div>
+                </div>
+
+                {/* Expanded */}
+                {isOpen && (
+                  <div style={{borderTop:"1px solid #F0EEE8",padding:"16px 14px"}}>
+
+                    {activeTab==="Usage" && (
+                      <div>
+                        <div style={{padding:"11px 13px",background:f.color+"10",border:`1px solid ${f.color}30`,borderRadius:"8px",marginBottom:"14px"}}>
+                          <div style={{fontSize:"13px",color:"#444",lineHeight:1.65,fontStyle:"italic"}}>{f.usage.notes}</div>
+                        </div>
+                        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px"}}>
+                          {[
+                            {label:"Time of day", items:["Morning","Day","Evening","Night"], key:"time"},
+                            {label:"Temperature", items:["Hot","Humid","Warm","Cool","Cold"], key:"temperature"},
+                          ].map(({label,items,key})=>(
+                            <div key={key} style={{background:"#F8F7F4",borderRadius:"8px",padding:"11px",border:"1px solid #EEECEA"}}>
+                              <div style={{fontSize:"9px",letterSpacing:"0.15em",color:"#BBB",marginBottom:"8px",textTransform:"uppercase"}}>{label}</div>
+                              <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
+                                {items.map(t=><span key={t} style={badge(t,f.usage[key].includes(t),f.color)}>{t}</span>)}
+                              </div>
+                            </div>
+                          ))}
+                          {[
+                            {label:"Occasion", items:f.usage.occasion},
+                            {label:"Setting", items:f.usage.setting},
+                            {label:"Social context", items:f.usage.social},
+                          ].map(({label,items})=>(
+                            <div key={label} style={{background:"#F8F7F4",borderRadius:"8px",padding:"11px",border:"1px solid #EEECEA"}}>
+                              <div style={{fontSize:"9px",letterSpacing:"0.15em",color:"#BBB",marginBottom:"8px",textTransform:"uppercase"}}>{label}</div>
+                              <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
+                                {items.map(o=><span key={o} style={badge(o,true,f.color)}>{o}</span>)}
+                              </div>
+                            </div>
+                          ))}
+                          <div style={{background:"#F8F7F4",borderRadius:"8px",padding:"11px",border:"1px solid #EEECEA"}}>
+                            <div style={{fontSize:"9px",letterSpacing:"0.15em",color:"#BBB",marginBottom:"8px",textTransform:"uppercase"}}>Performance</div>
+                            <div style={{marginBottom:"8px"}}>
+                              <div style={{fontSize:"10px",color:"#BBB",marginBottom:"3px"}}>Duration</div>
+                              <div style={{fontSize:"13px",color:"#333",fontWeight:500}}>{f.usage.duration}</div>
+                            </div>
+                            <div style={{fontSize:"10px",color:"#BBB",marginBottom:"5px"}}>Intensity</div>
+                            <div style={{display:"flex",alignItems:"center",gap:"8px"}}>
+                              <div style={{display:"flex",gap:"3px"}}>
+                                {[1,2,3,4,5].map(i=><div key={i} style={{width:"5px",height:"16px",borderRadius:"2px",background:i<=f.usage.intensity?f.color:"#EEE"}}/>)}
+                              </div>
+                              <span style={{fontSize:"12px",color:f.color,fontWeight:500}}>{intensityLabel(f.usage.intensity)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab==="Notes" && (
+                      <div>
+                        <div style={{fontSize:"11px",letterSpacing:"0.1em",color:"#AAA",marginBottom:"14px",textTransform:"uppercase"}}>{f.family}</div>
+                        {[
+                          {label:"Top notes",key:"top",timing:"First 15–30 min",bg:"#EFF5FB",border:"#B8D4F0",tc:"#1A3A6A"},
+                          {label:"Middle notes",key:"middle",timing:"30 min – 3 hrs",bg:"#FBF4E8",border:"#F0D4A0",tc:"#6A4010"},
+                          {label:"Base notes",key:"base",timing:"3 hrs onwards",bg:"#F4EEF8",border:"#D4B8E8",tc:"#4A1A6A"},
+                        ].map(layer=>(
+                          <div key={layer.key} style={{marginBottom:"12px"}}>
+                            <div style={{display:"flex",justifyContent:"space-between",marginBottom:"7px"}}>
+                              <div style={{fontSize:"10px",letterSpacing:"0.1em",color:"#888",textTransform:"uppercase"}}>{layer.label}</div>
+                              <div style={{fontSize:"10px",color:"#BBB",fontStyle:"italic"}}>{layer.timing}</div>
+                            </div>
+                            <div style={{display:"flex",flexWrap:"wrap",gap:"5px"}}>
+                              {f[layer.key].map(n=>(
+                                <span key={n} style={{fontSize:"12px",padding:"3px 9px",borderRadius:"6px",background:layer.bg,border:`1px solid ${layer.border}`,color:layer.tc}}>{n}</span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {activeTab==="Application" && (
+                      <div>
+                        <div style={{display:"flex",alignItems:"baseline",gap:"10px",marginBottom:"14px"}}>
+                          <div style={{fontSize:"32px",color:f.color,fontWeight:500}}>{f.sprays}</div>
+                          <div style={{fontSize:"11px",color:"#AAA",letterSpacing:"0.08em",textTransform:"uppercase"}}>sprays</div>
+                        </div>
+                        <div style={{padding:"13px",background:"#F8F7F4",border:"1px solid #EEECEA",borderRadius:"8px",marginBottom:"12px"}}>
+                          <div style={{fontSize:"9px",letterSpacing:"0.12em",color:"#BBB",marginBottom:"7px",textTransform:"uppercase"}}>How to apply</div>
+                          <div style={{fontSize:"13px",color:"#444",lineHeight:1.7}}>{f.application}</div>
+                        </div>
+                        <div style={{display:"flex",gap:"8px"}}>
+                          <div style={{flex:1,padding:"11px",background:"#F8F7F4",borderRadius:"8px",border:"1px solid #EEECEA"}}>
+                            <div style={{fontSize:"9px",letterSpacing:"0.1em",color:"#BBB",marginBottom:"4px",textTransform:"uppercase"}}>Duration</div>
+                            <div style={{fontSize:"14px",color:"#333",fontWeight:500}}>{f.usage.duration}</div>
+                          </div>
+                          <div style={{flex:1,padding:"11px",background:"#F8F7F4",borderRadius:"8px",border:"1px solid #EEECEA"}}>
+                            <div style={{fontSize:"9px",letterSpacing:"0.1em",color:"#BBB",marginBottom:"4px",textTransform:"uppercase"}}>Intensity</div>
+                            <div style={{fontSize:"14px",color:f.color,fontWeight:500}}>{intensityLabel(f.usage.intensity)}</div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          {filtered.length===0 && (
+            <div style={{textAlign:"center",padding:"48px",color:"#CCC",fontSize:"14px",fontStyle:"italic"}}>No fragrances match your current filters.</div>
+          )}
+        </div>
+
+        <div style={{textAlign:"center",marginTop:"36px",fontSize:"10px",color:"#CCC",letterSpacing:"0.1em",textTransform:"uppercase"}}>
+          {collection.length} fragrances · Gonk's wardrobe
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
